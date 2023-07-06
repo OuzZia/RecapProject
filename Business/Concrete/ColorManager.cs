@@ -24,18 +24,12 @@ namespace Business.Concrete
         [ValidationAspect(typeof(ColorValidator))]
         public IResult Add(Color color)
         {
-            //ValidationTool.Validate(new ColorValidator(), color);
             _iColorDal.Add(color);
             return new Result(true, Messages.Added);
         }
-
+        [ValidationAspect(typeof(BrandValidator))]
         public IResult Delete(Color color)
         {
-            var result = _iColorDal.Get(c => c.Id == color.Id);
-            if (result==null)
-            {
-                return new ErrorResult(Messages.InvalidEntity);
-            }
             _iColorDal.Delete(color);
             return new Result(true, Messages.Deleted);
         }
@@ -54,13 +48,9 @@ namespace Business.Concrete
             return new SuccessDataResult<Color>(result,Messages.ColorsListed);
         }
 
+        [ValidationAspect(typeof(ColorValidator))]
         public IResult Update(Color color)
         {
-            var result = _iColorDal.Get(c => c.Id == color.Id);
-            if (result==null)
-            {
-                return new ErrorResult(Messages.InvalidEntity);
-            }
             _iColorDal.Update(color);
             return new SuccessResult(Messages.Updated);
         }

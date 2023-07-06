@@ -1,7 +1,13 @@
 ﻿using Business.Abstract;
+using Business.Constants;
+using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Validation;
+using Core.Utilities.Business;
+using Core.Utilities.Helpers;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,23 +17,43 @@ namespace Business.Concrete
     public class CarImageManager : ICarImageService
     {
         ICarImageDal _carImageDal;
-        ICarService _carService;
 
-        public CarImageManager(ICarImageDal carImageDal, ICarService carService)
+        public CarImageManager(ICarImageDal carImageDal)
         {
             _carImageDal = carImageDal;
-            _carService = carService;
-        }
-        public IResult Add(CarImage image)
-        {
-            _carImageDal.Add(image);
-            return new SuccessResult();
         }
 
+
+        [ValidationAspect(typeof(CarImageValidator))]
+        public IResult Add(IFormFile image, CarImage carImage)
+        {
+            IResult result = BusinessRules.Run(CheckImageLimitExceded(carImage.CarId));
+            if (result!=null)
+            {
+                return result;
+            }
+
+            var imageResult = FileHelper.Add(image);
+            carImage.ImagePath = imageResult.Message;
+            if (!imageResult.Success)
+            {
+                return new ErrorResult(imageResult.Message);
+            }
+            _carImageDal.Add(carImage);
+            return new SuccessResult(Messages.CarImageAdded);
+        }
+
+        [ValidationAspect(typeof(CarImageValidator))]
         public IResult Delete(CarImage image)
         {
-            _carImageDal.Delete(image);
-            return new SuccessResult();
+            var carToBeDeleted = _carImageDal.Get(i => i.Id == image.Id);
+            if (carToBeDeleted==null)
+            {
+                return new ErrorResult(Messages.CarImagesNotFound);
+            }
+            FileHelper.Delete(carToBeDeleted.ImagePath);
+            _carImageDal.Delete(carToBeDeleted);
+            return new SuccessResult(Messages.CarImageDeleted);
         }
 
         public IDataResult<List<CarImage>> GetAll()
@@ -35,18 +61,39 @@ namespace Business.Concrete
             return new SuccessDataResult<List<CarImage>>(_carImageDal.GetAll());
         }
 
-        public IDataResult<List<CarImage>> GetAllByCarId(int id)
+        public IDataResult<List<CarImage>> GetAllByCarId(int carId)
         {
-            return new SuccessDataResult<List<CarImage>>(_carImageDal.GetAll(i=> i.CarId==id));
+            return new SuccessDataResult<List<CarImage>>(_carImageDal.GetAll(i=> i.CarId==carId));
         }
         public IDataResult<CarImage> GetById(int id)
         {
             return new SuccessDataResult<CarImage>(_carImageDal.Get(i => i.Id == id));
         }
 
-        public IResult Update(CarImage image)
+        public IResult Update(IFormFile image, CarImage carImage)
         {
-            _carImageDal.Update(image);
+            var carToBeUpdated = _carImageDal.Get(i => i.Id == carImage.Id);
+            if (carToBeUpdated == null)
+            {
+                return new ErrorResult(Messages.CarImagesNotFound);
+            }
+            var imageResult = FileHelper.Update(image, carToBeUpdated.ImagePath);
+            carImage.ImagePath = imageResult.Message;
+            if (!imageResult.Success)
+            {
+                return new ErrorResult(imageResult.Message);
+            }
+            _carImageDal.Update(carImage);
+            return new SuccessResult(Messages.CarImageUpdated);
+        }
+
+        private IResult CheckImageLimitExceded(int carId)
+        {
+            var carImagesOfTheCar = _carImageDal.GetAll(i => i.CarId == carId);
+            if (carImagesOfTheCar.Count >=5)
+            {
+                return new ErrorResult(Messages.CarImageLimitExceeded);
+            }
             return new SuccessResult();
         }
     }
