@@ -22,6 +22,7 @@ namespace Core.Utilities.Helpers
 
             var type = Path.GetExtension(file.FileName);
             var typeValid = CheckFileTypeValid(type);
+
             if (!typeValid.Success)
             {
                 return new ErrorResult(typeValid.Message);
