@@ -24,13 +24,13 @@ namespace Business.Concrete
         }
 
 
-        [ValidationAspect(typeof(CarImageValidator))]
+        //[ValidationAspect(typeof(CarImageValidator))]
         public IResult Add(IFormFile image, CarImage carImage)
         {
-            IResult result = BusinessRules.Run(CheckImageLimitExceded(carImage.CarId));
-            if (result!=null)
+            IResult ruleResult = BusinessRules.Run(CheckImageLimitExceded(carImage.CarId));
+            if (ruleResult!=null)
             {
-                return result;
+                return ruleResult;
             }
 
             var imageResult = FileHelper.Add(image);
@@ -43,7 +43,7 @@ namespace Business.Concrete
             return new SuccessResult(Messages.CarImageAdded);
         }
 
-        [ValidationAspect(typeof(CarImageValidator))]
+        //[ValidationAspect(typeof(CarImageValidator))]
         public IResult Delete(CarImage image)
         {
             var carToBeDeleted = _carImageDal.Get(i => i.Id == image.Id);
@@ -58,7 +58,7 @@ namespace Business.Concrete
 
         public IDataResult<List<CarImage>> GetAll()
         {
-            return new SuccessDataResult<List<CarImage>>(_carImageDal.GetAll());
+            return new SuccessDataResult<List<CarImage>>(_carImageDal.GetAll(),Messages.CarImagesListed);
         }
 
         public IDataResult<List<CarImage>> GetAllByCarId(int carId)

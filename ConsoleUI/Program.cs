@@ -94,16 +94,27 @@ namespace ConsoleUI
             //    }
             //}
 
-            CarManager carManager = new CarManager(new EfCarDal());
-            var result = carManager.GetByDailyPrice(10,500);
+            //CarManager carManager = new CarManager(new EfCarDal());
+            //var result = carManager.GetByDailyPrice(10,500);
+            //if (result.Success)
+            //{
+            //    foreach (var item in result.Data)
+            //    {
+            //        Console.WriteLine(item.Description + " " + item.DailyPrice);
+            //    }
+            //}
+            //Console.WriteLine(result.Message);
+
+            CarImageManager carImageManager = new CarImageManager(new EfCarImageDal());
+            var result = carImageManager.GetAll();
             if (result.Success)
             {
                 foreach (var item in result.Data)
                 {
-                    Console.WriteLine(item.Description + " " + item.DailyPrice);
+                    Console.WriteLine(item.CarId + " " + item.ImagePath + " "+ item.Id + " " + item.Date);
                 }
             }
-            Console.WriteLine(result.Message);
         }
+
     }
 }

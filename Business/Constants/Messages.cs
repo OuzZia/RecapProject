@@ -34,5 +34,6 @@ namespace Business.Constants
         public static string ThisCarNotReturned = "Araç müşteride, kiralanamaz";
         public static string ReturnDateCannotBeEarlierThanRentDate = "Araç dönüş tarihi kiralama tarihinden daha önce olamaz";
         public static string ThisCarCanNotBeRentedForThisRentDate = "Bu araç bu tarihlerde müsait değil";
+        public static string CarImagesListed = "Araç görselleri listelendi";
     }
 }
