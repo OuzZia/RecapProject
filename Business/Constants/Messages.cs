@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Core.Entities.Concrete;
+using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace Business.Constants
@@ -35,5 +37,12 @@ namespace Business.Constants
         public static string ReturnDateCannotBeEarlierThanRentDate = "Araç dönüş tarihi kiralama tarihinden daha önce olamaz";
         public static string ThisCarCanNotBeRentedForThisRentDate = "Bu araç bu tarihlerde müsait değil";
         public static string CarImagesListed = "Araç görselleri listelendi";
+        public static string UserRegistered = "Kayıt başarılı";
+        public static string UserNotFound = "Kullanıcı kaydı bulunamadı";
+        public static string PasswordError = "Hatalı şifre";
+        public static string SuccessfulLogin = "Giriş başarılı";
+        public static string UserAlreadyExists = "Bu email ile başka bir kayıt mevcut";
+        public static string AccessTokenCreated = "Token oluşturuldu";
+        public static string AuthorizationDenied = "Yetkiniz yok";
     }
 }
